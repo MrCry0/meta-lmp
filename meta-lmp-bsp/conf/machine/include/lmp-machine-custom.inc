@@ -173,6 +173,24 @@ BOOTSCR_LOAD_ADDR:imx7ulpea-ucom = "0x60800000"
 UBOOT_MACHINE:imx7ulpea-ucom = "mx7ulp_com_defconfig"
 UBOOT_CONFIG:imx7ulpea-ucom = ""
 
+# iMX7ULP
+UBOOT_SIGN_ENABLE:sota:mx7ulp-generic-bsp = "1"
+PREFERRED_PROVIDER_virtual/kernel:mx7ulp-generic-bsp ?= "linux-lmp-fslc-imx"
+PREFERRED_PROVIDER_u-boot-default-script:mx7ulp-generic-bsp = "u-boot-base-scr"
+PREFERRED_PROVIDER_u-boot-default-script:sota:mx7ulp-generic-bsp = "u-boot-ostree-scr-fit"
+LMP_BOOT_FIRMWARE_FILES:mx7ulp-generic-bsp = "SPL u-boot.itb"
+IMAGE_BOOT_FILES:mx7ulp-generic-bsp = "boot.scr uEnv.txt zImage ${@make_dtb_boot_files(d)}"
+IMAGE_BOOT_FILES:sota:mx7ulp-generic-bsp = "boot.itb"
+KERNEL_IMAGETYPE:sota:mx7ulp-generic-bsp = "fitImage"
+KERNEL_CLASSES:sota:mx7ulp-generic-bsp = " kernel-lmp-fitimage "
+# OSTREE_KERNEL_ARGS_COMMON:mx7ulp-generic-bsp ?= "earlycon root=/dev/mmcblk0p2 rootfstype=ext4"
+UBOOT_CLASSES:mx7ulp-generic-bsp = "uboot-fitimage"
+UBOOT_CONFIG:mx7ulp-generic-bsp = ""
+# NXP i.MX7ULP EVK
+SOTA_CLIENT_FEATURES:append:imx7ulp-evk = " ubootenv"
+BOOTSCR_LOAD_ADDR:imx7ulp-evk = "0x60800000"
+UBOOT_MACHINE:imx7ulp-evk = "mx7ulp_com_defconfig"
+
 # iMX6UL
 UBOOT_SIGN_ENABLE:sota:mx6ul-generic-bsp = "1"
 PREFERRED_PROVIDER_virtual/kernel:mx6ul-nxp-bsp ?= "linux-lmp-fslc-imx"

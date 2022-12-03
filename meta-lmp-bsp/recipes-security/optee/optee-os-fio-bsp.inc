@@ -1,10 +1,17 @@
 OPTEEMACHINE:am62xx = "k3-am62x"
+do_deploy:prepend:mx6ul-nxp-bsp() {
+    install -d ${DEPLOYDIR}/${PN}
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/SPL ${DEPLOYDIR}/${PN}/SPL-mfgtool
+    install -m 0644 ${DEPLOY_DIR_IMAGE}/u-boot.itb ${DEPLOYDIR}/${PN}/u-boot-mfgtool.itb
+}
+
 OPTEEMACHINE:am64xx = "k3-am64x"
 OPTEEMACHINE:apalis-imx6 = "imx-mx6qapalis"
 OPTEEMACHINE:apalis-imx8 = "imx-mx8qmmek"
 OPTEEMACHINE:imx6ulevk = "imx-mx6ulevk"
 OPTEEMACHINE:imx6ullevk = "imx-mx6ullevk"
 OPTEEMACHINE:imx7ulpea-ucom = "imx-mx7ulpevk"
+OPTEEMACHINE:imx7ulp-evk = "imx-mx7ulpevk"
 OPTEEMACHINE:imx8mm-lpddr4-evk = "imx-mx8mmevk"
 OPTEEMACHINE:imx8mp-lpddr4-evk = "imx-mx8mpevk"
 OPTEEMACHINE:imx8mq-evk = "imx-mx8mqevk"
@@ -67,6 +74,12 @@ EXTRA_OEMAKE:append:imx6ullevk = " \
     CFG_DT=y CFG_OVERLAY_ADDR=0x86000000 \
 "
 EXTRA_OEMAKE:append:imx7ulpea-ucom = " \
+    CFG_DRAM_BASE=0x60000000 CFG_NS_ENTRY_ADDR=0x67800000 \
+    CFG_TZDRAM_START=0x9e000000 \
+    CFG_DT=y CFG_OVERLAY_ADDR=0x65000000 \
+    CFG_NXP_CAAM=y \
+"
+EXTRA_OEMAKE:append:imx7ulp-evk = " \
     CFG_DRAM_BASE=0x60000000 CFG_NS_ENTRY_ADDR=0x67800000 \
     CFG_TZDRAM_START=0x9e000000 \
     CFG_DT=y CFG_OVERLAY_ADDR=0x65000000 \
