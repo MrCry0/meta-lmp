@@ -1,0 +1,66 @@
+From a0bde88ef27fe3ae27a9f07745bdaf1f891c0c28 Mon Sep 17 00:00:00 2001
+From: Oleksandr Suvorov <oleksandr.suvorov@foundries.io>
+Date: Sat, 7 Jan 2023 14:17:10 +0200
+Subject: [PATCH 2/3] [FIO extras] arm64: dts: imx8mm-evkb: add uart bluetooth
+
+Make UART bluetooth driver be initialised automatically.
+
+Signed-off-by: Oleksandr Suvorov <oleksandr.suvorov@foundries.io>
+---
+
+ arch/arm64/boot/dts/freescale/imx8mm-evkb.dts | 21 +++++++++++++++++++
+ drivers/bluetooth/hci_bcm.c                   |  1 +
+ 2 files changed, 22 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts b/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
+index 8663b3ddc103..fde3e1d3bbfa 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
+@@ -44,6 +44,16 @@ opp-750M {
+ 	};
+ };
+ 
++&uart1 { /* BT */
++	bluetooth {
++		compatible = "brcm,bcm43438-bt";
++		device-wakeup-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
++		host-wakeup-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
++		max-speed = <3000000>;
++		brcm,bt-pcm-int-params = [c0 c6 2d 00];
++	};
++};
++
+ &flexspi {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_flexspi>;
+@@ -159,4 +169,15 @@ MX8MM_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K	0x141
+ 			MX8MM_IOMUXC_SD1_DATA7_GPIO2_IO9		0x159
+ 		>;
+ 	};
++
++	pinctrl_uart1: uart1grp {
++		fsl,pins = <
++			MX8MM_IOMUXC_UART1_RXD_UART1_DCE_RX     0x140
++			MX8MM_IOMUXC_UART1_TXD_UART1_DCE_TX     0x140
++			MX8MM_IOMUXC_UART3_RXD_UART1_DCE_CTS_B  0x140
++			MX8MM_IOMUXC_UART3_TXD_UART1_DCE_RTS_B  0x140
++			MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7        0x19
++			MX8MM_IOMUXC_SD1_DATA6_GPIO2_IO8        0x19
++		>;
++	};
+ };
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index cf622e459605..a3f3e041f822 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1504,6 +1504,7 @@ static struct bcm_device_data bcm4354_device_data = {
+ };
+ 
+ static struct bcm_device_data bcm43438_device_data = {
++	.no_early_set_baudrate = true,
+ 	.drive_rts_on_open = true,
+ };
+ 
+-- 
+2.39.0
+

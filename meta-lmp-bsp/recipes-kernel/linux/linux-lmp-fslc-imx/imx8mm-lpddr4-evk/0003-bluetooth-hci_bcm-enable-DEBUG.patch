@@ -1,0 +1,214 @@
+From d4fc2641de6e0bf8092f54d03158493ed08909ed Mon Sep 17 00:00:00 2001
+From: Oleksandr Suvorov <oleksandr.suvorov@foundries.io>
+Date: Sat, 7 Jan 2023 17:29:37 +0200
+Subject: [PATCH 3/3] bluetooth: hci_bcm: enable DEBUG
+
+Signed-off-by: Oleksandr Suvorov <oleksandr.suvorov@foundries.io>
+---
+
+ arch/arm64/boot/dts/freescale/imx8mm-evkb.dts |  2 +-
+ drivers/bluetooth/hci_bcm.c                   | 24 +++++++++++++++----
+ drivers/bluetooth/hci_serdev.c                |  2 ++
+ drivers/tty/serdev/core.c                     |  2 ++
+ 4 files changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts b/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
+index fde3e1d3bbfa..8494c210d93b 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
++++ b/arch/arm64/boot/dts/freescale/imx8mm-evkb.dts
+@@ -49,7 +49,7 @@ bluetooth {
+ 		compatible = "brcm,bcm43438-bt";
+ 		device-wakeup-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+ 		host-wakeup-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
+-		max-speed = <3000000>;
++		max-speed = <115200>;
+ 		brcm,bt-pcm-int-params = [c0 c6 2d 00];
+ 	};
+ };
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index a3f3e041f822..1fba942d481d 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -6,6 +6,8 @@
+  *  Copyright (C) 2015  Intel Corporation
+  */
+ 
++#define DEBUG
++
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
+ #include <linux/skbuff.h>
+@@ -156,6 +158,7 @@ MODULE_PARM_DESC(irq_polarity, "IRQ polarity 0: active-high 1: active-low");
+ 
+ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ {
++	dev_info(&hu->hdev->dev, "%s()\n", __func__);
+ 	if (hu->serdev)
+ 		serdev_device_set_baudrate(hu->serdev, speed);
+ 	else
+@@ -168,6 +171,7 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 	struct sk_buff *skb;
+ 	struct bcm_update_uart_baud_rate param;
+ 
++	dev_info(&hdev->dev, "%s()\n", __func__);
+ 	if (speed > 3000000) {
+ 		struct bcm_write_uart_clock_setting clock;
+ 
+@@ -236,6 +240,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ {
+ 	int err;
+ 
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	if (powered && !dev->res_enabled) {
+ 		/* Intel Macs use bcm_apple_get_resources() and don't
+ 		 * have regulator supplies configured.
+@@ -430,7 +435,7 @@ static int bcm_open(struct hci_uart *hu)
+ 	struct list_head *p;
+ 	int err;
+ 
+-	bt_dev_dbg(hu->hdev, "hu %p", hu);
++	bt_dev_dbg(hu->hdev, "%s: hu %p", __func__, hu);
+ 
+ 	if (!hci_uart_has_flow_control(hu))
+ 		return -EOPNOTSUPP;
+@@ -511,7 +516,7 @@ static int bcm_close(struct hci_uart *hu)
+ 	struct bcm_device *bdev = NULL;
+ 	int err;
+ 
+-	bt_dev_dbg(hu->hdev, "hu %p", hu);
++	bt_dev_dbg(hu->hdev, "%s: hu %p", __func__, hu);
+ 
+ 	/* Protect bcm->dev against removal of the device or driver */
+ 	mutex_lock(&bcm_device_lock);
+@@ -552,7 +557,7 @@ static int bcm_flush(struct hci_uart *hu)
+ {
+ 	struct bcm_data *bcm = hu->priv;
+ 
+-	bt_dev_dbg(hu->hdev, "hu %p", hu);
++	bt_dev_dbg(hu->hdev, "%s: hu %p", __func__, hu);
+ 
+ 	skb_queue_purge(&bcm->txq);
+ 
+@@ -566,7 +571,7 @@ static int bcm_setup(struct hci_uart *hu)
+ 	unsigned int speed;
+ 	int err;
+ 
+-	bt_dev_dbg(hu->hdev, "hu %p", hu);
++	bt_dev_dbg(hu->hdev, "%s: hu %p", __func__, hu);
+ 
+ 	hu->hdev->set_diag = bcm_set_diag;
+ 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
+@@ -981,18 +986,21 @@ static int bcm_apple_get_resources(struct bcm_device *dev)
+ #else
+ static inline int bcm_apple_get_resources(struct bcm_device *dev)
+ {
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	return -EOPNOTSUPP;
+ }
+ #endif /* CONFIG_ACPI */
+ 
+ static int bcm_gpio_set_device_wakeup(struct bcm_device *dev, bool awake)
+ {
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	gpiod_set_value_cansleep(dev->device_wakeup, awake);
+ 	return 0;
+ }
+ 
+ static int bcm_gpio_set_shutdown(struct bcm_device *dev, bool powered)
+ {
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	gpiod_set_value_cansleep(dev->shutdown, powered);
+ 	if (dev->reset)
+ 		/*
+@@ -1011,6 +1019,7 @@ static struct clk *bcm_get_txco(struct device *dev)
+ {
+ 	struct clk *clk;
+ 
++	dev_info(dev, "%s()\n", __func__);
+ 	/* New explicit name */
+ 	clk = devm_clk_get(dev, "txco");
+ 	if (!IS_ERR(clk) || PTR_ERR(clk) == -EPROBE_DEFER)
+@@ -1114,6 +1123,7 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 	struct resource_entry *entry;
+ 	int ret;
+ 
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	/* Retrieve UART ACPI info */
+ 	dev->gpio_int_idx = -1;
+ 	ret = acpi_dev_get_resources(ACPI_COMPANION(dev->dev),
+@@ -1163,12 +1173,14 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ #else
+ static int bcm_acpi_probe(struct bcm_device *dev)
+ {
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	return -EINVAL;
+ }
+ #endif /* CONFIG_ACPI */
+ 
+ static int bcm_of_probe(struct bcm_device *bdev)
+ {
++	dev_info(bdev->dev, "%s()\n", __func__);
+ 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
+ 	device_property_read_u8_array(bdev->dev, "brcm,bt-pcm-int-params",
+ 				      bdev->pcm_int_params, 5);
+@@ -1189,6 +1201,7 @@ static int bcm_probe(struct platform_device *pdev)
+ 
+ 	dev->dev = &pdev->dev;
+ 
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	ret = platform_get_irq(pdev, 0);
+ 	if (ret < 0)
+ 		return ret;
+@@ -1228,6 +1241,7 @@ static int bcm_remove(struct platform_device *pdev)
+ {
+ 	struct bcm_device *dev = platform_get_drvdata(pdev);
+ 
++	dev_info(dev->dev, "%s()\n", __func__);
+ 	mutex_lock(&bcm_device_lock);
+ 	list_del(&dev->list);
+ 	mutex_unlock(&bcm_device_lock);
+@@ -1452,6 +1466,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 		return -ENOMEM;
+ 
+ 	bcmdev->dev = &serdev->dev;
++	dev_info(bcmdev->dev, "%s()\n", __func__);
+ #ifdef CONFIG_PM
+ 	bcmdev->hu = &bcmdev->serdev_hu;
+ #endif
+@@ -1495,6 +1510,7 @@ static void bcm_serdev_remove(struct serdev_device *serdev)
+ {
+ 	struct bcm_device *bcmdev = serdev_device_get_drvdata(serdev);
+ 
++	dev_info(bcmdev->dev, "%s()\n", __func__);
+ 	hci_uart_unregister_device(&bcmdev->serdev_hu);
+ }
+ 
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 649d112eea78..3d6d51ed2dc3 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -11,6 +11,8 @@
+  *  Copyright (C) 2004-2005  Marcel Holtmann <marcel@holtmann.org>
+  */
+ 
++#define DEBUG
++
+ #include <linux/kernel.h>
+ #include <linux/types.h>
+ #include <linux/serdev.h>
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index f1324fe99378..9efdcc919435 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -6,6 +6,8 @@
+  * Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+  */
+ 
++#define DEBUG
++
+ #include <linux/acpi.h>
+ #include <linux/errno.h>
+ #include <linux/idr.h>
+-- 
+2.39.0
+
