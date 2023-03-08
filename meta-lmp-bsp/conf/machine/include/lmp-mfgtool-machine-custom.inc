@@ -13,6 +13,17 @@ IMAGE_BOOT_FILES:imx7ulpea-ucom = "boot.itb SPL u-boot.itb"
 KERNEL_IMAGETYPE:imx7ulpea-ucom = "fitImage"
 KERNEL_CLASSES:imx7ulpea-ucom = " kernel-lmp-fitimage "
 
+# iMX7ULP
+UBOOT_SIGN_ENABLE:mx7ulp-generic-bsp = "1"
+PREFERRED_PROVIDER_virtual/kernel:mx7ulp-nxp-bsp = "linux-lmp-dev-mfgtool"
+IMX_DEFAULT_BOOTLOADER:mx7ulp-generic-bsp ?= "u-boot-fio-mfgtool"
+PREFERRED_PROVIDER_u-boot-default-script:mx7ulp-generic-bsp = "u-boot-ostree-scr-fit"
+UBOOT_CLASSES:mx7ulp-generic-bsp = "uboot-fitimage"
+IMAGE_BOOT_FILES:remove:mx7ulp-generic-bsp = "boot.scr uEnv.txt zImage"
+IMAGE_BOOT_FILES:append:mx7ulp-generic-bsp = " boot.itb SPL u-boot.itb"
+KERNEL_IMAGETYPE:mx7ulp-generic-bsp = "fitImage"
+KERNEL_CLASSES:mx7ulp-generic-bsp = " kernel-lmp-fitimage "
+
 # iMX6UL
 UBOOT_SIGN_ENABLE:mx6ul-generic-bsp = "1"
 PREFERRED_PROVIDER_virtual/kernel:mx6ul-nxp-bsp = "linux-lmp-dev-mfgtool"
