@@ -100,3 +100,17 @@ groupadd ${LMP_USER}; \
 useradd -p '${LMP_PASSWORD}' ${LMP_USER}; \
 usermod -a -G sudo,users,audio,plugdev ${LMP_USER}; \
 "
+
+# Custom selected common features
+
+# Factory tooling requires SOTA (OSTree + Aktualizr-lite)
+require ${@bb.utils.contains('DISTRO_FEATURES', 'sota', 'lmp-feature-factory.inc', '', d)}
+
+# Enable wayland related recipes if required by DISTRO
+require ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'lmp-feature-wayland.inc', '', d)}
+
+# Enable debug tool set
+require ${@bb.utils.contains('DISTRO_FEATURES', 'lmpdebug', 'lmp-feature-debug.inc', '', d)}
+
+# Enable OP-TEE related recipes if provided by the image
+require ${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'recipes-samples/images/lmp-feature-optee.inc', '', d)}

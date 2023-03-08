@@ -2,8 +2,6 @@ SUMMARY = "Basic console-based gateway image"
 
 require lmp-image-common.inc
 
-require ${@bb.utils.contains('DISTRO_FEATURES', 'sota', 'lmp-feature-factory.inc', '', d)}
-require ${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'lmp-feature-wayland.inc', '', d)}
 require lmp-feature-ota-utils.inc
 require lmp-feature-wireguard.inc
 require lmp-feature-docker.inc
@@ -15,7 +13,6 @@ require lmp-feature-softhsm.inc
 require lmp-feature-sysctl-hang-crash-helper.inc
 require lmp-feature-sysctl-net-queue-pfifo-fast.inc
 
-require ${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'lmp-feature-optee.inc', '', d)}
 require ${@bb.utils.contains('MACHINE_FEATURES', 'tpm2', 'lmp-feature-tpm2.inc', '', d)}
 require ${@bb.utils.contains('DISTRO_FEATURES', 'ima', 'lmp-feature-ima.inc', '', d)}
 
