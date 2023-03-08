@@ -1,0 +1,22 @@
+uuu_version 1.2.39
+
+SDP: boot -f SPL-mfgtool
+
+SDPV: delay 1000
+SDPV: write -f u-boot-mfgtool.itb
+SDPV: jump
+
+FB: ucmd setenv fastboot_dev mmc
+FB: ucmd setenv emmc_dev 0
+FB: ucmd mmc dev ${emmc_dev}
+FB: ucmd setenv emmc_cmd mmc partconf ${emmc_dev} 0 1 0;
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+FB: ucmd setenv emmc_cmd mmc bootbus ${emmc_dev} 2 2 1;
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+# FB: ucmd mmc dev ${emmc_dev} 1; mmc erase 2 0x1FFE
+FB: flash bootloader ../SPL-@@MACHINE@@
+FB: flash bootloader2 ../u-boot-@@MACHINE@@.itb
+FB: flash bootloader_s ../SPL-@@MACHINE@@
+FB: flash bootloader2_s ../u-boot-@@MACHINE@@.itb
+FB: flash sit ../sit-@@MACHINE@@.bin
+FB: done
