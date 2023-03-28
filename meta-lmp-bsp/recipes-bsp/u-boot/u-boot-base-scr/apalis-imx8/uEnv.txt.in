@@ -1,3 +1,4 @@
+mmcargs=setenv bootargs console=${console},${baudrate} root=PARTUUID=${uuid} rootwait mmcdev=0 resume=/dev/mmcblk0p3
 bootcmd_dtb=fatload ${devtype} ${devnum}:1 ${fdt_addr_r} ${fdtfile}
 bootcmd_load_k=fatload ${devtype} ${devnum}:1 ${kernel_addr_r} ${boot_file}
 bootcmd_run=booti ${kernel_addr_r} - ${fdt_addr_r}

@@ -6,3 +6,4 @@ tmpfs                /var/volatile        tmpfs      defaults              0  0
 
 # boot partition
 LABEL=boot           /mnt/boot            vfat       noatime,sync          0  0
+LABEL=swap           swap                 swap       defaults              0  0

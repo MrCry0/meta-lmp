@@ -285,6 +285,7 @@ PREFERRED_PROVIDER_virtual/kernel:apalis-imx8 ?= "linux-lmp-toradex-imx"
 UBOOT_CONFIG:apalis-imx8 = ""
 UBOOT_SUFFIX:apalis-imx8 = "bin"
 UBOOT_MACHINE:apalis-imx8 = "apalis-imx8_defconfig"
+WKS_FILE:apalis-imx8 = "imx-imx-boot-bootpart-swap.wks.in"
 
 # iMX8ULP
 UBOOT_SIGN_ENABLE:sota:mx8ulp-generic-bsp = "1"
