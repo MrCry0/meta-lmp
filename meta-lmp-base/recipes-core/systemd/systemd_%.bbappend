@@ -66,6 +66,7 @@ SRC_URI:append = " \
 	file://0001-tmpfiles-tmp.conf-reduce-cleanup-age-to-half.patch \
 	file://systemd-networkd-wait-online.service.in-use-any-by-d.patch \
 	file://systemd-timesyncd-update.service \
+    file://tmpfiles.conf \
 "
 
 # Depend on systemd-boot as the efi payload is provided by a different recipe
@@ -93,4 +94,9 @@ do_install:append() {
 	if ${@bb.utils.contains('PACKAGECONFIG', 'efi', 'true', 'false', d)}; then
 		rm -r ${D}${nonarch_libdir}/systemd/boot
 	fi
+
+    install -D -m 0644 ${WORKDIR}/tmpfiles.conf ${D}${nonarch_libdir}/tmpfiles.d/systemd_var_lib_systemd.conf
+    (cd ${D}${localstatedir}; rmdir -v --parents lib/systemd)
 }
+
+FILES:${PN} += "${nonarch_libdir}/tmpfiles.d/systemd_var_lib_systemd.conf"
