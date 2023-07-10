@@ -1,6 +1,7 @@
 [Unit]
 Description=Non-Resident HCI-based Bluetooth Serial Attach Initialization
 ConditionFileNotEmpty=/etc/bluetooth/hciattach.conf
+ConditionFirmware=device-tree-compatible(${HCI_ATTACH_BOARD})
 After=rc-local.service
 
 [Service]

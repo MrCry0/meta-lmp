@@ -1,9 +1,15 @@
-#!/bin/bash
+#!/bin/sh
+
+set -e
 
 if [[ -z $1 || -z $2 || -z $3 ]]; then
-    echo Usage: $0 {tty} {speed} {proto}
+    echo Usage: $0 {board} {tty} {speed}
     exit
 fi
+
+board=$1
+tty=$2
+speed=$3
 
 if grep -qE "(fsl,imx8mm-evkb|fsl,imx8mp-evk)" /proc/device-tree/compatible &>/dev/null; then
         echo imx8mm-evkb/imx8mp-evk found. Setting up the High Speed HCI interface...
