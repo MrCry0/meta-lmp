@@ -1,3 +1,5 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
 include recipes-kernel/linux/linux-lmp-fslc-imx.inc
 
 include recipes-kernel/linux/kmeta-linux-lmp-6.1.y.inc
