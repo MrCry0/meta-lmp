@@ -30,6 +30,8 @@ do_compile[depends] = " \
     ${@bb.utils.contains('MACHINE_FEATURES', 'optee', 'virtual/optee-os:do_deploy', '', d)} \
 "
 
+# do_deploy[depends] += "imx-mkimage:do_install"
+
 do_compile:prepend:mx8ulp-nxp-bsp() {
     if [ -f ${DEPLOY_DIR_IMAGE}/${M33_DEFAULT_IMAGE} ]; then
         cp ${DEPLOY_DIR_IMAGE}/${M33_DEFAULT_IMAGE} ${BOOT_STAGING}/m33_image.bin
